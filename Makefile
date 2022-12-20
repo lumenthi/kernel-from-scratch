@@ -47,9 +47,16 @@ NAME_ISO = kernel.iso
 
 KERNELDIR = kernel
 
-KERNEL_SRCS = kernel.c
+KERNEL_SRCS =	kernel.c \
+				kputchar.c \
+				kputstr.c \
+				out.c \
+				in.c \
+				itoa.c \
+				strlen.c \
+				keyboard.c \
 
-KERNEL_HEADS = kernel.h
+KERNEL_HEADS = kernel.h keyboard.h vga.h
 
 KERNEL_SOURCES = $(addprefix $(SRCDIR)/$(KERNELDIR)/, $(KERNEL_SRCS))
 KERNEL_OBJECTS = $(addprefix $(OBJDIR)/$(KERNELDIR)/, $(KERNEL_SRCS:.c=.o))
