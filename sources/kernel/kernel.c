@@ -7,17 +7,26 @@
 #include "keyboard.h"
 #include "vga.h"
 
+bool	running;
+
 void kernel_entry(void) 
 {
+	running = true;
 	/* Initialize terminal interface */
 	terminal_initialize();
 
 	unsigned char c;
-	while (1) {
+	while (running) {
 		c = keyboard_handler();
 		switch (c) {
+			/* TODO: Shutdown beautifuly */
 			case KP_ESC:
+				running = false;
+				break;
+			case KR_ESC:
+				running = false;
 				break;
 		}
 	}
+	return;
 }

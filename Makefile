@@ -70,6 +70,17 @@ BOOT_SRCS = boot.s
 BOOT_SOURCES = $(addprefix $(SRCDIR)/$(BOOTDIR)/, $(BOOT_SRCS))
 BOOT_OBJECTS = $(addprefix $(OBJDIR)/$(BOOTDIR)/, $(BOOT_SRCS:.s=.o))
 
+TODOS=$(shell grep -nr "TODO" $(SRCDIR) $(HEADDIR) | wc -l)
+
+###############
+
+# Count files to compile
+SHOULD_COUNT=1
+FILES_TO_COMPILE = 0
+ifeq ($(SHOULD_COUNT), 1)
+	FILES_TO_COMPILE:=$(shell make -n SHOULD_COUNT=0 | grep "gcc" | wc -l)
+endif
+
 ###############
 
 # QEMU
@@ -85,6 +96,9 @@ RED = '\033[4;31m'
 BLANK = '\033[0m'
 YELLOW = '\033[4;33m'
 CYAN = '\033[4;38;5;51m'
+WARNING = '\033[1;33m'
+RESET = '\033[0m'
+COMPILE_COLOR = '\033[0;33m'
 
 TICK = '\033[1;32m~\033[0m'
 CROSS = '\033[1;31mx\033[0m'
@@ -118,9 +132,12 @@ $(KERNLIB):
 
 ##### KERNEL COMPILATION #####
 
+I =  1
 $(KERNEL_OBJECTS): $(OBJDIR)/$(KERNELDIR)/%.o: $(SRCDIR)/$(KERNELDIR)/%.c $(KERNEL_HEADERS)
+	@ printf "[$(I)/$(FILES_TO_COMPILE)] "
 	@ mkdir -p $(OBJDIR)/$(KERNELDIR)
 	$(HOSTCC) $(HOSTCFLAGS) -o $@ $<
+	$(eval I=$(shell echo $$(($(I) + 1))))
 
 ##############################
 
@@ -165,6 +182,11 @@ debug: all
 	@ echo 'continue' >> debug.tmp
 	@ printf "@ Run %bexec gdb -x %b%b in another window to start debugging\n" $(CYAN) $(DEBUG_FILE) $(BLANK)
 	$(QEMU) $(QEMUFLAGS) -cdrom $(X86TARGETDIR)/$(NAME_ISO)
+
+todo:
+	@ printf "%b" $(WARNING)
+	@ grep -nr "TODO" $(SRCDIR) $(HEADDIR) || true
+	@ printf "%b" $(BLANK)
 
 run: all
 	$(QEMU) -cdrom $(X86TARGETDIR)/$(NAME_ISO)
