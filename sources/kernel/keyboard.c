@@ -33,7 +33,7 @@ unsigned char	keyboard_handler()
 		return c;
 	//printk("0x%x ", c);
 	if (oldc == KEXTENDED) {
-		if (c == KR_RIGHT && get_next_char() != 0) {
+		if (c == KR_RIGHT && get_terminal_char(terminal_column, terminal_row) != 0) {
 			terminal_column++;
 			update_cursor();
 		}
