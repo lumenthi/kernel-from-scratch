@@ -13,6 +13,9 @@ typedef unsigned int	uint32_t;
 typedef unsigned long	uint64_t;
 typedef int				bool;*/
 
+#define KPROMPT "kfs$ "
+#define KPROMPT_SIZE strlen(KPROMPT)
+
 extern size_t terminal_row;
 extern size_t terminal_column;
 extern uint8_t terminal_color;
@@ -23,11 +26,16 @@ void	outb(uint16_t port, uint8_t val);
 uint8_t	inb(uint16_t port);
 
 /* terminal */
-void	kputchar(char c);
-void	kputstr(const char *s);
-void	terminal_putentryat(char c, uint8_t color, size_t x, size_t y);
-void	update_cursor(int x, int y);
+void			kputchar(char c);
+void			kputstr(const char *s);
+void			terminal_putentryat(char c, uint8_t color, size_t x, size_t y);
+void			update_cursor();
+void			terminal_shift_up();
+void			terminal_shift_right();
+unsigned char	get_next_char();
+unsigned char	get_terminal_char(int x, int y);
 
+/* utils */
 char	*itoa(int value, char *str, int base);
 size_t	strlen(const char *s);
 void	bzero(void *s, size_t n);

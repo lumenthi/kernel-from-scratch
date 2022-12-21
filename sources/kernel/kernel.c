@@ -12,11 +12,12 @@ void kernel_entry(void)
 	/* Initialize terminal interface */
 	terminal_initialize();
 
-	/* Newline support is left as an exercise. */
-	printk("Hello, kernel World!\nC'est moi KFS\n");
-
-	printk("Coucou %d test de printk %x\n", -34, 0x60);
+	unsigned char c;
 	while (1) {
-		keyboard_handler();
+		c = keyboard_handler();
+		switch (c) {
+			case KP_ESC:
+				break;
+		}
 	}
 }
