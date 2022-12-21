@@ -1,4 +1,4 @@
-#include "kernel.h"
+#include "kernlib.h"
 #include "vga.h"
 
 void kputchar(char c) 

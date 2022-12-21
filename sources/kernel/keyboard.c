@@ -27,15 +27,11 @@ void	keyboard_handler()
 {
 	char c;
 	c = inb(0x60);
-	if (c > 0 && c < 256)
+	if (c > 0 && c < 256) {
 		c = keyboard_mapping[c];
-	if (c != oldc && is_print(c)) {
-		kputchar(c);
-		/*kputstr("\n (");
-		char *str;
-		itoa(c, str, 10);
-		kputstr(str);
-		kputstr(")\n");*/
-		oldc = c;
+		if (c != oldc && is_print(c)) {
+			kputchar(c);
+			oldc = c;
+		}
 	}
 }

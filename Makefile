@@ -18,7 +18,8 @@ HOSTCFLAGS = -fno-builtin \
 				-m32 \
 				-ffreestanding \
 				-static \
-				-c
+				-c \
+				-I$(HEADDIR) -I$(KERNLIBDIR)/headers -I$(KERNLIBDIR)/printk/headers
 
 HOSTLINKER = ld
 # -m elf_i386: emulate the elf_i386 linker
@@ -47,16 +48,14 @@ NAME_ISO = kernel.iso
 
 KERNELDIR = kernel
 
+# LIB
+KERNLIBDIR = $(SRCDIR)/$(KERNELDIR)/kernlib
+KERNLIB = $(KERNLIBDIR)/kernlib.a
+
 KERNEL_SRCS =	kernel.c \
-				kputchar.c \
-				kputstr.c \
-				out.c \
-				in.c \
-				itoa.c \
-				strlen.c \
 				keyboard.c \
 
-KERNEL_HEADS = kernel.h keyboard.h vga.h
+KERNEL_HEADS = kernel.h keyboard.h
 
 KERNEL_SOURCES = $(addprefix $(SRCDIR)/$(KERNELDIR)/, $(KERNEL_SRCS))
 KERNEL_OBJECTS = $(addprefix $(OBJDIR)/$(KERNELDIR)/, $(KERNEL_SRCS:.c=.o))
@@ -94,26 +93,34 @@ CROSS = '\033[1;31mx\033[0m'
 
 vpath %.c sources
 
-all: $(X86TARGETDIR)/$(NAME_ISO)
+all:
+	@ $(MAKE) -s -C $(KERNLIBDIR)
+	@ $(MAKE) --no-print-directory $(X86TARGETDIR)/$(NAME_ISO)
 
-$(X86TARGETDIR)/$(NAME_ISO): $(KERNEL_OBJECTS) $(BOOT_OBJECTS)
+$(X86TARGETDIR)/$(NAME_ISO): $(KERNLIB) $(KERNEL_OBJECTS) $(BOOT_OBJECTS)
 	@ mkdir -p $(X86TARGETDIR)/$(ISODIR)/$(BOOTDIR)/$(GRUBDIR)
 	@ cp $(SRCDIR)/$(BOOTDIR)/$(GRUBCFG) $(X86TARGETDIR)/$(ISODIR)/$(BOOTDIR)/$(GRUBDIR)/
 	@ cp $(SRCDIR)/$(LINKER) $(X86TARGETDIR)/$(ISODIR)/
 
 	$(HOSTLINKER) $(HOSTLINKERFLAG) -o $(X86TARGETDIR)/$(ISODIR)/$(BOOTDIR)/$(NAME) \
-		-T $(X86TARGETDIR)/$(ISODIR)/$(LINKER) $(KERNEL_OBJECTS) $(BOOT_OBJECTS)
+		-T $(X86TARGETDIR)/$(ISODIR)/$(LINKER) $(KERNEL_OBJECTS) \
+			$(KERNLIB) $(BOOT_OBJECTS)
 
 	grub-mkrescue -o $(X86TARGETDIR)/$(NAME_ISO) $(X86TARGETDIR)/$(ISODIR) \
 		> /dev/null 2>&1
 
 	@ printf " %b | Compiled %b%b%b\n" $(TICK) $(GREEN) $(NAME) $(BLANK)
 
+##### KERNEL LIB #####
+
+$(KERNLIB):
+	@ $(MAKE) -s -C $(KERNLIBDIR)
+
 ##### KERNEL COMPILATION #####
 
 $(KERNEL_OBJECTS): $(OBJDIR)/$(KERNELDIR)/%.o: $(SRCDIR)/$(KERNELDIR)/%.c $(KERNEL_HEADERS)
 	@ mkdir -p $(OBJDIR)/$(KERNELDIR)
-	@ $(HOSTCC) $(HOSTCFLAGS) -I$(HEADDIR) -o $@ $<
+	$(HOSTCC) $(HOSTCFLAGS) -o $@ $<
 
 ##############################
 
@@ -126,6 +133,7 @@ $(BOOT_OBJECTS): $(OBJDIR)/$(BOOTDIR)/%.o: $(SRCDIR)/$(BOOTDIR)/%.s
 ############################
 
 clean:
+	@ $(MAKE) -s -C $(KERNLIBDIR) clean
 	@ test -d $(OBJDIR) && \
 	rm -rf $(OBJDIR) && \
 	printf " %b | " $(TICK) && \
@@ -134,7 +142,8 @@ clean:
 	printf "No %b%b%b folder\n" $(YELLOW) $(OBJDIR) $(BLANK))
 
 fclean: clean
-	@ test -f $(DEBUG_FILE) && \
+	@ test -f $(KERNLIB) && rm -rf $(KERNLIB) && \
+	test -f $(DEBUG_FILE) && \
 	rm -rf $(DEBUG_FILE) && \
 	printf " %b | " $(TICK) && \
 	printf "Removed %b%b%b file\n" $(RED) $(DEBUG_FILE) $(BLANK) \

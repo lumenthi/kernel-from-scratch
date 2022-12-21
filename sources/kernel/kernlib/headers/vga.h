@@ -1,6 +1,8 @@
 #ifndef VGA_H
 #define VGA_H
 
+#include <stddef.h>
+
 /* Hardware text mode color constants. */
 enum vga_color {
 	VGA_COLOR_BLACK = 0,
@@ -33,5 +35,9 @@ static inline uint16_t vga_entry(unsigned char uc, uint8_t color)
 {
 	return (uint16_t) uc | (uint16_t) color << 8;
 }
+
+void terminal_initialize(void);
+void terminal_putentryat(char c, uint8_t color, size_t x, size_t y);
+void terminal_setcolor(uint8_t color);
 
 #endif
