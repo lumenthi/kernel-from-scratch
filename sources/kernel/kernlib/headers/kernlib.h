@@ -13,7 +13,7 @@ typedef unsigned int	uint32_t;
 typedef unsigned long	uint64_t;
 typedef int				bool;*/
 
-#define KPROMPT "kfs$ "
+#define KPROMPT "[termnial] $ "
 #define KPROMPT_SIZE strlen(KPROMPT)
 
 void	outb(uint16_t port, uint8_t val);

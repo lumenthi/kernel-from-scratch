@@ -27,6 +27,8 @@ size_t	delay;
 unsigned char	c;
 unsigned char	oldc;
 
+bool	shift = false;
+
 unsigned char	keyboard_handler()
 {
 	c = inb(0x60);
