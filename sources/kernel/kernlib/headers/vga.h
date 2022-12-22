@@ -29,9 +29,9 @@ enum vga_color {
 #define SCREEN1		0x00
 #define SCREEN2		0x01
 
-char	kscreen[NB_SCREENS][VGA_WIDTH * VGA_HEIGHT];
-char	*current_screen;
-int		current_screen_id;
+uint16_t	kscreen[NB_SCREENS][VGA_WIDTH * VGA_HEIGHT];
+uint16_t	*current_screen;
+int			current_screen_id;
 
 struct cursor {
 	int	x;

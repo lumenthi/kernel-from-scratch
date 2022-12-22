@@ -24,12 +24,15 @@ void	terminal_initialize(void)
 		for (size_t x = 0; x < VGA_WIDTH; x++) {
 			const size_t index = y * VGA_WIDTH + x;
 			terminal_buffer[index] = vga_entry(0, terminal_color);
-			kscreen[0][index] = 0;
-			kscreen[1][index] = 0;
+			kscreen[0][index] = vga_entry(0, terminal_color);
+			kscreen[1][index] = vga_entry(0, terminal_color);
 		}
 	}
 
-	printk("Welcome to {green}--KFS--\n");
+	printk("--- Welcome to 42 KFS | {green}Screen 1{reset} ---\n");
+	swap_screen();
+	printk("--- Welcome to 42 KFS | {cyan}Screen 2{reset} ---\n");
+	swap_screen();
 
 	cursor[0].y = VGA_HEIGHT - 1;
 	cursor[1].y = VGA_HEIGHT - 1;
@@ -57,7 +60,7 @@ void	terminal_shift_right()
 
 void	terminal_shift_up()
 {
-	for (int y = 0; y < VGA_HEIGHT - 1; y++) {
+	for (int y = 1; y < VGA_HEIGHT - 1; y++) {
 		const size_t row = y * VGA_WIDTH;
 		const size_t next_row = (y + 1) * VGA_WIDTH;
 		for (int x = 0; x < VGA_WIDTH - 1; x++) {
@@ -68,7 +71,7 @@ void	terminal_shift_up()
 	}
 	for (size_t x = 0; x < VGA_WIDTH; x++) {
 		terminal_buffer[(VGA_HEIGHT - 1) * VGA_WIDTH + x] = vga_entry(0, terminal_color);
-		current_screen[(VGA_HEIGHT - 1) * VGA_WIDTH + x] = 0;
+		current_screen[(VGA_HEIGHT - 1) * VGA_WIDTH + x] = vga_entry(0, terminal_color);
 	}
 }
 
@@ -93,10 +96,9 @@ void	terminal_putentryat(char c, uint8_t color, size_t x, size_t y)
 {
 	const size_t index = y * VGA_WIDTH + x;
 	terminal_buffer[index] = vga_entry(c, color);
-	current_screen[index] = c;
+	current_screen[index] = vga_entry(c, color);
 }
 
-/* TODO: write the current screen ID somewhere on the screen */
 void	swap_screen()
 {
 	current_screen_id = current_screen_id == SCREEN1 ? SCREEN2 : SCREEN1;
@@ -105,7 +107,7 @@ void	swap_screen()
 	for (size_t y = 0; y < VGA_HEIGHT; y++) {
 		for (size_t x = 0; x < VGA_WIDTH; x++) {
 			const size_t index = y * VGA_WIDTH + x;
-			terminal_buffer[index] = vga_entry(current_screen[index], terminal_color);
+			terminal_buffer[index] = current_screen[index];
 		}
 	}
 	update_cursor();

@@ -46,6 +46,7 @@ unsigned char	keyboard_handler()
 		else if (c == KR_PAGEUP || c == KR_PAGEDOWN)
 			swap_screen();
 	}
+	/* TODO: handle backspace, del */
 	oldc = c;
 	c = keyboard_mapping[c];
 	if (is_print(c)) {

@@ -27,6 +27,7 @@ void			update_cursor();
 void			terminal_shift_up();
 void			terminal_shift_right();
 void			swap_screen();
+void			analyze_ansi();
 unsigned char	get_next_char();
 unsigned char	get_terminal_char(int x, int y);
 
@@ -37,5 +38,7 @@ void	bzero(void *s, size_t n);
 void	*memcpy(void *dst, const void *src, size_t n);
 void	*memset(void *b, int c, size_t len);
 void	*memmove(void *dst, const void *src, size_t n);
+int		strcmp(const char *s1, const char *s2);
+int		atoi(const char *str);
 
 #endif
