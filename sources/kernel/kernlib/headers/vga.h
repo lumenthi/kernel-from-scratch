@@ -3,7 +3,6 @@
 
 #include <stddef.h>
 
-/* Hardware text mode color constants. */
 enum vga_color {
 	VGA_COLOR_BLACK = 0,
 	VGA_COLOR_BLUE = 1,
@@ -23,8 +22,28 @@ enum vga_color {
 	VGA_COLOR_WHITE = 15,
 };
 
-static const size_t VGA_WIDTH = 80;
-static const size_t VGA_HEIGHT = 25;
+#define VGA_WIDTH	80
+#define VGA_HEIGHT	25
+
+#define NB_SCREENS	2
+#define SCREEN1		0x00
+#define SCREEN2		0x01
+
+char	kscreen[NB_SCREENS][VGA_WIDTH * VGA_HEIGHT];
+char	*current_screen;
+int		current_screen_id;
+
+struct cursor {
+	int	x;
+	int	y;
+};
+
+extern struct cursor	cursor[NB_SCREENS];
+extern struct cursor	*current_cursor;
+extern uint8_t			terminal_color;
+extern uint16_t			*terminal_buffer;
+extern bool				terminal_show_cursor;
+
 
 static inline uint8_t vga_entry_color(enum vga_color fg, enum vga_color bg) 
 {

@@ -3,7 +3,7 @@
 
 void update_cursor()
 {
-	uint16_t pos = terminal_row * VGA_WIDTH + terminal_column;
+	uint16_t pos = current_cursor->y * VGA_WIDTH + current_cursor->x;
 
 	outb(0x3D4, 0x0F);
 	outb(0x3D5, (uint8_t) (pos & 0xFF));

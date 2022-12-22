@@ -1,6 +1,7 @@
 #include "keyboard.h"
 #include "kernel.h"
 #include "printk.h"
+#include "vga.h"
 
 const unsigned char keyboard_mapping[256] =
 {
@@ -34,19 +35,21 @@ unsigned char	keyboard_handler()
 	//printk("0x%x ", c);
 	if (oldc == KEXTENDED) {
 		/* TODO: handle line too big */
-		if (c == KR_RIGHT && get_terminal_char(terminal_column, terminal_row) != 0) {
-			terminal_column++;
+		if (c == KR_RIGHT && get_terminal_char(current_cursor->x, current_cursor->y) != 0) {
+			current_cursor->x++;
 			update_cursor();
 		}
-		else if (c == KR_LEFT && terminal_column > KPROMPT_SIZE) {
-			terminal_column--;
+		else if (c == KR_LEFT && current_cursor->x > KPROMPT_SIZE) {
+			current_cursor->x--;
 			update_cursor();
 		}
+		else if (c == KR_PAGEUP || c == KR_PAGEDOWN)
+			swap_screen();
 	}
 	oldc = c;
 	c = keyboard_mapping[c];
 	if (is_print(c)) {
-		if (get_terminal_char(terminal_column, terminal_row) == 0)
+		if (get_terminal_char(current_cursor->x, current_cursor->y) == 0)
 			kputchar(c);
 		else {
 			terminal_shift_right();

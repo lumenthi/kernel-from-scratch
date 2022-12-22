@@ -16,12 +16,6 @@ typedef int				bool;*/
 #define KPROMPT "kfs$ "
 #define KPROMPT_SIZE strlen(KPROMPT)
 
-extern size_t terminal_row;
-extern size_t terminal_column;
-extern uint8_t terminal_color;
-extern uint16_t* terminal_buffer;
-extern bool	terminal_show_cursor;
-
 void	outb(uint16_t port, uint8_t val);
 uint8_t	inb(uint16_t port);
 
@@ -32,6 +26,7 @@ void			terminal_putentryat(char c, uint8_t color, size_t x, size_t y);
 void			update_cursor();
 void			terminal_shift_up();
 void			terminal_shift_right();
+void			swap_screen();
 unsigned char	get_next_char();
 unsigned char	get_terminal_char(int x, int y);
 

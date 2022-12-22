@@ -231,6 +231,11 @@
 #define KR_LEFT				0xCB
 #define KR_DOWN				0xD0
 
+#define KP_PAGEUP			0x49
+#define KP_PAGEDOWN			0x51
+#define KR_PAGEUP			0xC9
+#define KR_PAGEDOWN			0xD1
+
 unsigned char	keyboard_handler(void);
 
 #endif
