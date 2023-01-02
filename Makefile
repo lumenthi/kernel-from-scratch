@@ -1,4 +1,4 @@
-.PHONY : all clean fclean re run
+.PHONY : all clean fclean re run docker
 
 HOSTAC = nasm
 # -f: format
@@ -120,8 +120,7 @@ $(X86TARGETDIR)/$(NAME_ISO): $(KERNLIB) $(KERNEL_OBJECTS) $(BOOT_OBJECTS)
 		-T $(X86TARGETDIR)/$(ISODIR)/$(LINKER) $(KERNEL_OBJECTS) \
 			$(KERNLIB) $(BOOT_OBJECTS)
 
-	grub-mkrescue -o $(X86TARGETDIR)/$(NAME_ISO) $(X86TARGETDIR)/$(ISODIR) \
-		> /dev/null 2>&1
+	@ grub-mkrescue -o $(X86TARGETDIR)/$(NAME_ISO) $(X86TARGETDIR)/$(ISODIR)
 
 	@ printf " %b | Compiled %b%b%b\n" $(TICK) $(GREEN) $(NAME) $(BLANK)
 
@@ -190,3 +189,9 @@ todo:
 
 run: all
 	$(QEMU) -cdrom $(X86TARGETDIR)/$(NAME_ISO)
+
+docker: all
+	docker build -t kfs-build .
+	docker run --rm --name kfs-build -d kfs-build
+	docker cp kfs-build:/kernel.iso ./targets/x86/kernel.iso
+	docker kill kfs-build
