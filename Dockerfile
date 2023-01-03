@@ -3,6 +3,7 @@ COPY targets/x86/iso /iso
 
 # Install packages
 RUN apt-get update -y && \
+	apt-get install -y grub2 && \
 	apt-get install -y xorriso && \
 	apt-get install -y grub-common
 
