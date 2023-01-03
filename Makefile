@@ -39,13 +39,15 @@ ISODIR = iso
 
 ###############
 
+# DOCKER
+NAME_DOCKER = kfs-build
+
 # LINKER
 LINKER = linker.ld
 
 # KERNEL
 NAME = kernel.bin
 NAME_ISO = kernel.iso
-
 KERNELDIR = kernel
 
 # LIB
@@ -75,7 +77,7 @@ TODOS=$(shell grep -nr "TODO" $(SRCDIR) $(HEADDIR) | wc -l)
 ###############
 
 # Count files to compile
-SHOULD_COUNT=1
+SHOULD_COUNT = 1
 FILES_TO_COMPILE = 0
 ifeq ($(SHOULD_COUNT), 1)
 	FILES_TO_COMPILE:=$(shell make -n SHOULD_COUNT=0 | grep "gcc" | wc -l)
@@ -105,22 +107,28 @@ CROSS = '\033[1;31mx\033[0m'
 
 ###############
 
-vpath %.c sources
-
 all:
 	@ $(MAKE) -s -C $(KERNLIBDIR)
-	@ $(MAKE) --no-print-directory $(X86TARGETDIR)/$(NAME_ISO)
+	@ env DOCKER_COMPILE=0 $(MAKE) --no-print-directory $(X86TARGETDIR)/$(NAME_ISO)
 
 $(X86TARGETDIR)/$(NAME_ISO): $(KERNLIB) $(KERNEL_OBJECTS) $(BOOT_OBJECTS)
 	@ mkdir -p $(X86TARGETDIR)/$(ISODIR)/$(BOOTDIR)/$(GRUBDIR)
 	@ cp $(SRCDIR)/$(BOOTDIR)/$(GRUBCFG) $(X86TARGETDIR)/$(ISODIR)/$(BOOTDIR)/$(GRUBDIR)/
 	@ cp $(SRCDIR)/$(LINKER) $(X86TARGETDIR)/$(ISODIR)/
 
-	$(HOSTLINKER) $(HOSTLINKERFLAG) -o $(X86TARGETDIR)/$(ISODIR)/$(BOOTDIR)/$(NAME) \
+	@ $(HOSTLINKER) $(HOSTLINKERFLAG) -o $(X86TARGETDIR)/$(ISODIR)/$(BOOTDIR)/$(NAME) \
 		-T $(X86TARGETDIR)/$(ISODIR)/$(LINKER) $(KERNEL_OBJECTS) \
-			$(KERNLIB) $(BOOT_OBJECTS)
+		$(KERNLIB) $(BOOT_OBJECTS)
 
-	@ grub-mkrescue -o $(X86TARGETDIR)/$(NAME_ISO) $(X86TARGETDIR)/$(ISODIR)
+	@echo "DOCKER_COMPILE = " $(DOCKER_COMPILE)
+ifeq ($(DOCKER_COMPILE), 0)
+	grub-mkrescue -o $(X86TARGETDIR)/$(NAME_ISO) $(X86TARGETDIR)/$(ISODIR)
+else
+	docker build -t $(NAME_DOCKER) .
+	docker run --rm --name $(NAME_DOCKER) -d $(NAME_DOCKER)
+	docker cp $(NAME_DOCKER):/$(NAME_ISO) $(X86TARGETDIR)/$(NAME_ISO)
+	docker kill $(NAME_DOCKER)
+endif
 
 	@ printf " %b | Compiled %b%b%b\n" $(TICK) $(GREEN) $(NAME) $(BLANK)
 
@@ -187,11 +195,9 @@ todo:
 	@ grep -nr "TODO" $(SRCDIR) $(HEADDIR) || true
 	@ printf "%b" $(BLANK)
 
-run: all
+run:
 	$(QEMU) -cdrom $(X86TARGETDIR)/$(NAME_ISO)
 
-docker: all
-	docker build -t kfs-build .
-	docker run --rm --name kfs-build -d kfs-build
-	docker cp kfs-build:/kernel.iso ./targets/x86/kernel.iso
-	docker kill kfs-build
+docker:
+	@ env DOCKER_COMPILE=1 $(MAKE) -s -C $(KERNLIBDIR)
+	@ $(MAKE) --no-print-directory $(X86TARGETDIR)/$(NAME_ISO)
