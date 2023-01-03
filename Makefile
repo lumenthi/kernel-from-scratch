@@ -120,13 +120,13 @@ $(X86TARGETDIR)/$(NAME_ISO): $(KERNLIB) $(KERNEL_OBJECTS) $(BOOT_OBJECTS)
 		-T $(X86TARGETDIR)/$(ISODIR)/$(LINKER) $(KERNEL_OBJECTS) \
 		$(KERNLIB) $(BOOT_OBJECTS)
 
-	@echo "DOCKER_COMPILE = " $(DOCKER_COMPILE)
 ifeq ($(DOCKER_COMPILE), 0)
 	grub-mkrescue -o $(X86TARGETDIR)/$(NAME_ISO) $(X86TARGETDIR)/$(ISODIR)
 else
 	docker build -t $(NAME_DOCKER) .
 	docker run --rm --name $(NAME_DOCKER) -d $(NAME_DOCKER)
 	docker cp $(NAME_DOCKER):/$(NAME_ISO) $(X86TARGETDIR)/$(NAME_ISO)
+	touch $(X86TARGETDIR)/$(NAME_ISO)
 	docker kill $(NAME_DOCKER)
 endif
 
@@ -199,5 +199,5 @@ run:
 	$(QEMU) -cdrom $(X86TARGETDIR)/$(NAME_ISO)
 
 docker:
-	@ env DOCKER_COMPILE=1 $(MAKE) -s -C $(KERNLIBDIR)
-	@ $(MAKE) --no-print-directory $(X86TARGETDIR)/$(NAME_ISO)
+	@ $(MAKE) -s -C $(KERNLIBDIR)
+	@ env DOCKER_COMPILE=1 $(MAKE) --no-print-directory $(X86TARGETDIR)/$(NAME_ISO)
