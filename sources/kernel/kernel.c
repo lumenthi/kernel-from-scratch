@@ -7,9 +7,9 @@
 #include "keyboard.h"
 #include "vga.h"
 
-bool	running;
+bool running;
 
-void kernel_entry(void) 
+void kernel_entry(void)
 {
 	running = true;
 	/* Initialize terminal interface */
@@ -19,7 +19,6 @@ void kernel_entry(void)
 	while (running) {
 		c = keyboard_handler();
 		switch (c) {
-			/* TODO: Shutdown beautifuly */
 			case KP_ESC:
 				running = false;
 				break;
@@ -28,5 +27,7 @@ void kernel_entry(void)
 				break;
 		}
 	}
+	/* Shutdown */
+	poweroff();
 	return;
 }

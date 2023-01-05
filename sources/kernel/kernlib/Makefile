@@ -26,6 +26,7 @@ SRC_RAW =	strlen.c \
 			strcmp.c \
 			atoi.c \
 			ansi.c \
+			poweroff.c
 
 SRC_SIZE = $(shell ls sources | wc -l)
 

@@ -17,7 +17,11 @@ typedef int				bool;*/
 #define KPROMPT_SIZE strlen(KPROMPT)
 
 void	outb(uint16_t port, uint8_t val);
+void	outw(uint16_t port, uint16_t val);
 uint8_t	inb(uint16_t port);
+
+/* ACPI management */
+void	poweroff(void);
 
 /* terminal */
 void			kputchar(char c);
