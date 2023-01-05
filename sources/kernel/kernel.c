@@ -28,5 +28,7 @@ void kernel_entry(void)
 				break;
 		}
 	}
+	/* TODO: code outw */
+	//outw(0x604, 0x2000);
 	return;
 }

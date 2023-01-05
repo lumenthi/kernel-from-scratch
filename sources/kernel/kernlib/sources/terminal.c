@@ -7,6 +7,7 @@ struct cursor	*current_cursor;
 uint8_t			terminal_color;
 uint16_t		*terminal_buffer;
 bool			terminal_show_cursor;
+unsigned int	line_count = 0;
 
 void	terminal_initialize(void)
 {
@@ -44,17 +45,33 @@ void	terminal_initialize(void)
 
 void	terminal_shift_right()
 {
-	size_t x;
-	for (x = current_cursor->x; x < VGA_WIDTH - 1; x++) {
-		const size_t index = current_cursor->y * VGA_WIDTH + x;
+	unsigned char c = get_char_at(VGA_WIDTH - 1, VGA_HEIGHT - 1);
+	if (c != 0) {
+		terminal_shift_up();
+		line_count++;
+		current_cursor->y--;
+	}
+	size_t start_index = current_cursor->y * VGA_WIDTH + current_cursor->x;
+	size_t index = start_index;
+	while (index < VGA_WIDTH * VGA_HEIGHT - 1) {
 		if (terminal_buffer[index] == 0)
 			break;
+		index++;
 	}
-	x--;
-	for ( ; x > current_cursor->x; x--) {
-		const size_t index = current_cursor->y * VGA_WIDTH + x;
+	while (index > start_index) {
 		terminal_buffer[index] = vga_entry(terminal_buffer[index - 1], terminal_color);
 		current_screen[index] = current_screen[index - 1];
+		index--;
+	}
+}
+
+void	terminal_shift_left()
+{
+	size_t index = current_cursor->x + VGA_WIDTH * current_cursor->y;
+	while (index < VGA_WIDTH * VGA_HEIGHT - 1) {
+		terminal_buffer[index] = vga_entry(terminal_buffer[index + 1], terminal_color);
+		current_screen[index] = current_screen[index + 1];
+		index++;
 	}
 }
 
@@ -63,9 +80,8 @@ void	terminal_shift_up()
 	for (int y = 1; y < VGA_HEIGHT - 1; y++) {
 		const size_t row = y * VGA_WIDTH;
 		const size_t next_row = (y + 1) * VGA_WIDTH;
-		for (int x = 0; x < VGA_WIDTH - 1; x++) {
-			terminal_buffer[row + x] =
-				terminal_buffer[next_row + x];
+		for (int x = 0; x < VGA_WIDTH; x++) {
+			terminal_buffer[row + x] = terminal_buffer[next_row + x];
 			current_screen[row + x] = current_screen[next_row + x];
 		}
 	}

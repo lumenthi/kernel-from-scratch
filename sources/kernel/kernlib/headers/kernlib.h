@@ -26,6 +26,7 @@ void			terminal_putentryat(char c, uint8_t color, size_t x, size_t y);
 void			update_cursor();
 void			terminal_shift_up();
 void			terminal_shift_right();
+void			terminal_shift_left();
 void			swap_screen();
 void			analyze_ansi();
 unsigned char	get_next_char();

@@ -32,10 +32,11 @@ enum vga_color {
 uint16_t	kscreen[NB_SCREENS][VGA_WIDTH * VGA_HEIGHT];
 uint16_t	*current_screen;
 int			current_screen_id;
+extern unsigned int	line_count;
 
 struct cursor {
-	int	x;
-	int	y;
+	unsigned int	x;
+	unsigned int	y;
 };
 
 extern struct cursor	cursor[NB_SCREENS];
@@ -53,6 +54,16 @@ static inline uint8_t vga_entry_color(enum vga_color fg, enum vga_color bg)
 static inline uint16_t vga_entry(unsigned char uc, uint8_t color) 
 {
 	return (uint16_t) uc | (uint16_t) color << 8;
+}
+
+static inline unsigned char get_char_at(unsigned int x, unsigned int y)
+{
+	return (unsigned char) terminal_buffer[x + y * VGA_WIDTH] & 0xFF;
+}
+
+static inline unsigned char get_char_at_index(unsigned int index)
+{
+	return (unsigned char) terminal_buffer[index] & 0xFF;
 }
 
 void terminal_initialize(void);

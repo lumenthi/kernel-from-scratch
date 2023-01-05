@@ -10,6 +10,7 @@ void	newline()
 {
 	current_cursor->x = 0;
 	current_cursor->y++;
+	line_count = 0;
 	if (current_cursor->y == VGA_HEIGHT) {
 		terminal_shift_up();
 		current_cursor->y = VGA_HEIGHT - 1;
@@ -25,7 +26,6 @@ void	kputchar(char c)
 		newline();
 		return ;
 	}
-	/* TODO: handle ansi when mutli screen is done */
 	else if (c == '\e') {
 		ansi = true;
 		ansi_index = 0;
@@ -45,6 +45,7 @@ void	kputchar(char c)
 	if (current_cursor->x == VGA_WIDTH) {
 		current_cursor->x = 0;
 		current_cursor->y++;
+		line_count++;
 		if (current_cursor->y == VGA_HEIGHT) {
 			terminal_shift_up();
 			current_cursor->y = VGA_HEIGHT - 1;
