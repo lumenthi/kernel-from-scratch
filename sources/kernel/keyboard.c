@@ -27,13 +27,15 @@ size_t	delay;
 unsigned char	c;
 unsigned char	oldc;
 
-bool	shift = false;
+bool	kcaps = false;
+bool	kshift = false;
 
 unsigned char	keyboard_handler()
 {
 	c = inb(0x60);
 	if (c == oldc)
 		return c;
+	oldc = c;
 	if (oldc == KEXTENDED) {
 		if (c == KR_RIGHT &&
 			get_terminal_char(current_cursor->x, current_cursor->y) != 0) {
@@ -54,10 +56,9 @@ unsigned char	keyboard_handler()
 			terminal_shift_left();
 			update_cursor();
 		}
-		oldc = c;
 		return keyboard_mapping[c];
 	}
-	else if (c == KR_BACKSPACE) {
+	if (c == KR_BACKSPACE) {
 		if (current_cursor->x > KPROMPT_SIZE || line_count > 0) {
 			current_cursor->x--;
 			kputchar(0);
@@ -70,11 +71,17 @@ unsigned char	keyboard_handler()
 			}
 			update_cursor();
 		}
-		oldc = c;
 		return keyboard_mapping[c];
 	}
-	oldc = c;
+	else if (c == KP_LSHIFT || c == KP_RSHIFT)
+		kshift = true;
+	else if (c == KR_LSHIFT || c == KR_RSHIFT)
+		kshift = false;
+	else if (c == KR_CAPSLOCK)
+		kcaps = kcaps == 1 ? 0 : 1;
 	c = keyboard_mapping[c];
+	if (kcaps ^ kshift)
+		c = toupper(c);
 	if (is_print(c)) {
 		if (get_terminal_char(current_cursor->x, current_cursor->y) == 0) {
 			kputchar(c);

@@ -1,6 +1,8 @@
 #ifndef KEYBOARD_H
 #define KEYBOARD_H
 
+#include <stdbool.h>
+
 /*
  * A keyboard has three 8-bit registers for communication with CPU:
  *	input buffer: Can be written by the CPU by writing port 0x60 or port 0x64
@@ -239,5 +241,8 @@
 #define KR_DELETE			0x53
 
 unsigned char	keyboard_handler(void);
+
+extern bool	kcaps;
+extern bool	kshift;
 
 #endif
