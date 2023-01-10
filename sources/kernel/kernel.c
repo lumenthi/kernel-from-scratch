@@ -11,11 +11,13 @@ bool running;
 
 void kernel_entry(void)
 {
+	unsigned char c;
+
 	running = true;
+	c = keyboard_handler(); // Flush the keyboard
 	/* Initialize terminal interface */
 	terminal_initialize();
 
-	unsigned char c;
 	while (running) {
 		c = keyboard_handler();
 		switch (c) {

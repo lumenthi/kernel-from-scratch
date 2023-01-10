@@ -1,2 +1,1 @@
-Il y a un enter en trop quand on lance sur les Dell
 TODO: laisser appuyer sur la touche (donc timer)
