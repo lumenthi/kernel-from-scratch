@@ -2,6 +2,10 @@
 #include "vga.h"
 #include "printk.h"
 
+uint16_t		kscreen[NB_SCREENS][VGA_WIDTH * VGA_HEIGHT];
+uint16_t		*current_screen;
+int				current_screen_id;
+
 struct cursor	cursor[NB_SCREENS];
 struct cursor	*current_cursor;
 uint8_t			terminal_color;
