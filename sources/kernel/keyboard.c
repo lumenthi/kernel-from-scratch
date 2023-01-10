@@ -57,7 +57,6 @@ unsigned char	keyboard_handler()
 		else if (c == KR_PAGEUP || c == KR_PAGEDOWN)
 			swap_screen();
 		else if (c == KR_DELETE) {
-			/* TODO: line_count-- when needed */
 			kputchar(' ');
 			current_cursor->x--;
 			terminal_shift_left();
