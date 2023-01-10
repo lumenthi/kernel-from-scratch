@@ -23,7 +23,7 @@ bool	is_print(char c)
 	return false;
 }
 
-size_t	delay;
+size_t			delay;
 unsigned char	c;
 unsigned char	oldc;
 
@@ -74,8 +74,7 @@ unsigned char	keyboard_handler()
 	}
 	oldc = c;
 	c = keyboard_mapping[c];
-	// printk("Special keyboard\n");
-	if (is_print(c)) {
+	if (is_print(c) && c != '\n') {
 		if (get_terminal_char(current_cursor->x, current_cursor->y) == 0) {
 			kputchar(c);
 		}

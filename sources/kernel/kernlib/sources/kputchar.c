@@ -20,7 +20,7 @@ void	newline()
 		update_cursor();
 }
 
-void	kputchar(char c) 
+void	kputchar(char c)
 {
 	if (c == '\n') {
 		newline();

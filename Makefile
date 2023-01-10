@@ -56,8 +56,11 @@ KERNLIB = $(KERNLIBDIR)/kernlib.a
 
 KERNEL_SRCS =	kernel.c \
 				keyboard.c \
+				shell.c
 
-KERNEL_HEADS = kernel.h keyboard.h
+KERNEL_HEADS = 	kernel.h \
+				keyboard.h \
+				shell.h
 
 KERNEL_SOURCES = $(addprefix $(SRCDIR)/$(KERNELDIR)/, $(KERNEL_SRCS))
 KERNEL_OBJECTS = $(addprefix $(OBJDIR)/$(KERNELDIR)/, $(KERNEL_SRCS:.c=.o))
