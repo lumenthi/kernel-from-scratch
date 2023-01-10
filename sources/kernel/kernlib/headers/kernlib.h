@@ -33,8 +33,6 @@ void			terminal_shift_right();
 void			terminal_shift_left();
 void			swap_screen();
 void			analyze_ansi();
-unsigned char	get_next_char();
-unsigned char	get_terminal_char(int x, int y);
 
 /* utils */
 char	*itoa(int value, char *str, int base);

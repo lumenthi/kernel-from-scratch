@@ -39,7 +39,7 @@ unsigned char	keyboard_handler()
 	if (oldc == KEXTENDED) {
 		oldc = c;
 		if (c == KP_RIGHT &&
-			get_terminal_char(current_cursor->x, current_cursor->y) != 0) {
+			get_char_at(current_cursor->x, current_cursor->y) != 0) {
 			current_cursor->x++;
 			update_cursor();
 		}

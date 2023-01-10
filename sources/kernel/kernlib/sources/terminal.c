@@ -101,18 +101,6 @@ void	terminal_setcolor(uint8_t color)
 	terminal_color = color;
 }
 
-unsigned char	get_terminal_char(int x, int y)
-{
-	return terminal_buffer[y * VGA_WIDTH + x];
-}
-
-unsigned char	get_next_char()
-{
-	if (current_cursor->x == VGA_WIDTH)
-		return 0;
-	return get_terminal_char(current_cursor->x + 1, current_cursor->y);
-}
-
 void	terminal_putentryat(char c, uint8_t color, size_t x, size_t y)
 {
 	const size_t index = y * VGA_WIDTH + x;
