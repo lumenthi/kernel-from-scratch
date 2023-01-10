@@ -28,12 +28,11 @@ unsigned char	c;
 unsigned char	oldc;
 
 bool	shift = false;
+bool	repeat = false;
 
 unsigned char	keyboard_handler()
 {
-	c = inb(0x60);
-	if (c == oldc)
-		return c;
+	while ((c = inb(0x60)) == oldc && !repeat);
 	if (oldc == KEXTENDED) {
 		if (c == KR_RIGHT &&
 			get_terminal_char(current_cursor->x, current_cursor->y) != 0) {
@@ -57,7 +56,7 @@ unsigned char	keyboard_handler()
 		oldc = c;
 		return keyboard_mapping[c];
 	}
-	else if (c == KR_BACKSPACE) {
+	else if (c == KP_BACKSPACE) {
 		if (current_cursor->x > KPROMPT_SIZE || line_count > 0) {
 			current_cursor->x--;
 			kputchar(0);
@@ -75,6 +74,7 @@ unsigned char	keyboard_handler()
 	}
 	oldc = c;
 	c = keyboard_mapping[c];
+	// printk("Special keyboard\n");
 	if (is_print(c)) {
 		if (get_terminal_char(current_cursor->x, current_cursor->y) == 0) {
 			kputchar(c);
@@ -84,5 +84,5 @@ unsigned char	keyboard_handler()
 			kputchar(c);
 		}
 	}
-	return c;
+	return oldc;
 }

@@ -19,6 +19,8 @@ void kernel_entry(void)
 	while (running) {
 		c = keyboard_handler();
 		switch (c) {
+			case KP_ENTER:
+				break;
 			case KP_ESC:
 				running = false;
 				break;
