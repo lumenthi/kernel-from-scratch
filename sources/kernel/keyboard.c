@@ -103,6 +103,8 @@ unsigned char	keyboard_handler()
 	else if (c == KR_CAPSLOCK)
 		kcaps = kcaps == 1 ? 0 : 1;
 	else if (c == KP_ENTER) {
+		current_cursor->x = VGA_WIDTH - 1;
+		current_cursor->y = VGA_HEIGHT - 1;
 		newline();
 		printk("%s", KPROMPT);
 		return keyboard_mapping[c];
