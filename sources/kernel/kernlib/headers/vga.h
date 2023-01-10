@@ -33,6 +33,7 @@ extern uint16_t		kscreen[NB_SCREENS][VGA_WIDTH * VGA_HEIGHT];
 extern uint16_t		*current_screen;
 extern int			current_screen_id;
 extern unsigned int	line_count;
+extern size_t		line_size;
 
 struct cursor {
 	unsigned int	x;

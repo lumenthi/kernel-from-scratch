@@ -12,6 +12,7 @@ uint8_t			terminal_color;
 uint16_t		*terminal_buffer;
 bool			terminal_show_cursor;
 unsigned int	line_count = 0;
+size_t			line_size = 0;
 
 void	terminal_initialize(void)
 {
