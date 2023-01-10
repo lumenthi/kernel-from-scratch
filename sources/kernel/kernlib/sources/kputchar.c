@@ -14,7 +14,6 @@ void	newline()
 	if (current_cursor->y == VGA_HEIGHT) {
 		terminal_shift_up();
 		current_cursor->y = VGA_HEIGHT - 1;
-		printk("%s", KPROMPT);
 	}
 	if (terminal_show_cursor)
 		update_cursor();
