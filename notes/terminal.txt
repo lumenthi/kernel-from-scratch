@@ -1,6 +1,3 @@
-Si ligne remonte on peut effacer le prompt
 Il y a un enter en trop quand on lance sur les Dell
 TODO: laisser appuyer sur la touche (donc timer)
-Enter quand ligne > 0 vide = bug
-Curseur fonctione pas sur Dell
-Differencier la gestion de \n et de KR_ENTER (pas de nouveau prompt pour les \n)
+TODO: gerer HOME et END

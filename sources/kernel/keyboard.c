@@ -46,7 +46,12 @@ unsigned char	keyboard_handler()
 		else if (c == KP_LEFT &&
 		(current_cursor->x > KPROMPT_SIZE ||
 			(line_count > 0 && current_cursor->y > VGA_HEIGHT - line_count))) {
-			current_cursor->x--;
+			if (current_cursor->x <= 0) {
+				current_cursor->x = VGA_WIDTH;
+				current_cursor->y--;
+			}
+			else
+				current_cursor->x--;
 			update_cursor();
 		}
 		else if (c == KR_PAGEUP || c == KR_PAGEDOWN)
@@ -61,7 +66,8 @@ unsigned char	keyboard_handler()
 	}
 	oldc = c;
 	if (c == KP_BACKSPACE) {
-		if (current_cursor->x > KPROMPT_SIZE || line_count > 0) {
+		if (current_cursor->x > KPROMPT_SIZE ||
+			(line_count > 0 && current_cursor->y > VGA_HEIGHT - line_count)) {
 			current_cursor->x--;
 			kputchar(0);
 			current_cursor->x--;
@@ -80,17 +86,16 @@ unsigned char	keyboard_handler()
 	else if (c == KR_LSHIFT || c == KR_RSHIFT)
 		kshift = false;
 	else if (c == KR_CAPSLOCK)
-		printk("Hello\n");
-		//kcaps = kcaps == 1 ? 0 : 1;
+		kcaps = kcaps == 1 ? 0 : 1;
 	else if (c == KP_ENTER) {
 		newline();
 		printk("%s", KPROMPT);
 		return keyboard_mapping[c];
 	}
 	c = keyboard_mapping[c];
-	if (kcaps ^ kshift)
-		c = toupper(c);
 	if (is_print(c)) {
+		if (kcaps ^ kshift)
+			c = toupper(c);
 		if (get_terminal_char(current_cursor->x, current_cursor->y) == 0) {
 			kputchar(c);
 		}
