@@ -1,3 +1,1 @@
 TODO: laisser appuyer sur la touche (donc timer)
-Enter quand ligne > 0 vide = bug
-Shift 

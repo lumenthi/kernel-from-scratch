@@ -33,8 +33,6 @@ void			terminal_shift_right();
 void			terminal_shift_left();
 void			swap_screen();
 void			analyze_ansi();
-unsigned char	get_next_char();
-unsigned char	get_terminal_char(int x, int y);
 
 /* utils */
 char	*itoa(int value, char *str, int base);
@@ -45,5 +43,7 @@ void	*memset(void *b, int c, size_t len);
 void	*memmove(void *dst, const void *src, size_t n);
 int		strcmp(const char *s1, const char *s2);
 int		atoi(const char *str);
+int		toupper(int c);
+int		tolower(int c);
 
 #endif

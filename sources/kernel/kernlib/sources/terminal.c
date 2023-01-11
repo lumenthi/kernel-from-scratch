@@ -2,12 +2,17 @@
 #include "vga.h"
 #include "printk.h"
 
+uint16_t		kscreen[NB_SCREENS][VGA_WIDTH * VGA_HEIGHT];
+uint16_t		*current_screen;
+int				current_screen_id;
+
 struct cursor	cursor[NB_SCREENS];
 struct cursor	*current_cursor;
 uint8_t			terminal_color;
 uint16_t		*terminal_buffer;
 bool			terminal_show_cursor;
 unsigned int	line_count = 0;
+size_t			line_size = 0;
 
 void	terminal_initialize(void)
 {
@@ -94,18 +99,6 @@ void	terminal_shift_up()
 void	terminal_setcolor(uint8_t color)
 {
 	terminal_color = color;
-}
-
-unsigned char	get_terminal_char(int x, int y)
-{
-	return terminal_buffer[y * VGA_WIDTH + x];
-}
-
-unsigned char	get_next_char()
-{
-	if (current_cursor->x == VGA_WIDTH)
-		return 0;
-	return get_terminal_char(current_cursor->x + 1, current_cursor->y);
 }
 
 void	terminal_putentryat(char c, uint8_t color, size_t x, size_t y)

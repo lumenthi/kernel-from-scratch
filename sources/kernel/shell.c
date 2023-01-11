@@ -11,14 +11,8 @@ void get_command(void)
 	int i = offset;
 	char c;
 
-	/* while (i < offset+20) {
-		c = get_char_at_index(i);
-		shell_buf[i-offset] = c;
-		i++;
-	} */
-
+	/* TODO: CHECK OVERFLOW [INPUT_LENGTH] */
 	while ((c = get_char_at_index(i))) {
-	//	printk("shell_buf[%d] = %c\n",i-offset, c);
 		shell_buf[i-offset] = c;
 		i++;
 	}

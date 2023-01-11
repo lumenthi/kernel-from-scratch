@@ -14,7 +14,6 @@ void	newline()
 	if (current_cursor->y == VGA_HEIGHT) {
 		terminal_shift_up();
 		current_cursor->y = VGA_HEIGHT - 1;
-		printk("%s", KPROMPT);
 	}
 	if (terminal_show_cursor)
 		update_cursor();
@@ -44,14 +43,16 @@ void	kputchar(char c)
 	}
 	if (current_cursor->x == VGA_WIDTH) {
 		current_cursor->x = 0;
+		if (current_cursor->y == VGA_HEIGHT - 1)
+			line_count++;
 		current_cursor->y++;
-		line_count++;
 		if (current_cursor->y == VGA_HEIGHT) {
 			terminal_shift_up();
 			current_cursor->y = VGA_HEIGHT - 1;
 		}
 	}
 	terminal_putentryat(c, terminal_color, current_cursor->x, current_cursor->y);
+	line_size++;
 	current_cursor->x++;
 	if (terminal_show_cursor)
 		update_cursor();
