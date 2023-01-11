@@ -2,6 +2,7 @@
 #include "kernel.h"
 #include "printk.h"
 #include "vga.h"
+#include "shell.h"
 
 const unsigned char keyboard_mapping[256] =
 {
@@ -104,9 +105,15 @@ unsigned char	keyboard_handler()
 		kcaps = kcaps == 1 ? 0 : 1;
 	else if (c == KP_ENTER) {
 		get_command();
-		current_cursor->x = VGA_WIDTH - 1;
-		current_cursor->y = VGA_HEIGHT - 1;
-		newline();
+		if (shell_buf && strlen(shell_buf)) {
+			newline();
+			handle_command(shell_buf);
+		}
+		else {
+			current_cursor->x = VGA_WIDTH - 1;
+			current_cursor->y = VGA_HEIGHT - 1;
+			newline();
+		}
 		printk("%s", KPROMPT);
 		return c;
 	}
