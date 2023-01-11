@@ -24,6 +24,7 @@ void kernel_entry(void)
 		c = keyboard_handler();
 		switch (c) {
 			case KP_ENTER:
+				/* printk("[%s]", shell_buf); */
 				shell_reset();
 				break;
 			case KP_ESC:
