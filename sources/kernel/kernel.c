@@ -24,8 +24,8 @@ void kernel_entry(void)
 		switch (c) {
 			case KP_ENTER:
 				get_command();
-				printk("Command to execute: [%s], line count [%d]", shell_buf, line_count);
-				kputchar('\n');
+				printk("Command to execute: [%s]", shell_buf);
+				// kputchar('\n');
 				shell_reset();
 				break;
 			case KP_ESC:

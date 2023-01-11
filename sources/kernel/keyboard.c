@@ -74,7 +74,7 @@ unsigned char	keyboard_handler()
 	}
 	oldc = c;
 	c = keyboard_mapping[c];
-	if (is_print(c) && c != '\n') {
+	if (is_print(c)) {
 		if (get_terminal_char(current_cursor->x, current_cursor->y) == 0) {
 			kputchar(c);
 		}
