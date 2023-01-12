@@ -27,7 +27,9 @@ SRC_RAW =	strlen.c \
 			atoi.c \
 			ansi.c \
 			poweroff.c \
-			case.c
+			case.c \
+			print_bits.c \
+			print_hexa.c \
 
 SRC_SIZE = $(shell ls sources | wc -l)
 

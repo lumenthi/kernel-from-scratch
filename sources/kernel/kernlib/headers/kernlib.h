@@ -45,5 +45,7 @@ int		strcmp(const char *s1, const char *s2);
 int		atoi(const char *str);
 int		toupper(int c);
 int		tolower(int c);
+void	print_bits(void *ptr, size_t bit_size);
+void	print_hexa(void *ptr, size_t byte_size);
 
 #endif

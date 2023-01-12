@@ -18,6 +18,10 @@ void kernel_entry(void)
 	/* Initialize terminal interface */
 	terminal_initialize();
 
+	/* GDT */
+	init_gdt();
+	/* TODO: load_gdt();*/
+
 	while (running) {
 		c = keyboard_handler();
 		switch (c) {
