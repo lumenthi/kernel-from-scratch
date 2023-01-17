@@ -60,7 +60,6 @@ KERNEL_SRCS =	kernel.c \
 
 KERNEL_HEADS =	kernel.h \
 				keyboard.h \
-				gdt.h \
 
 KERNEL_SOURCES = $(addprefix $(SRCDIR)/$(KERNELDIR)/, $(KERNEL_SRCS))
 KERNEL_OBJECTS = $(addprefix $(OBJDIR)/$(KERNELDIR)/, $(KERNEL_SRCS:.c=.o))
@@ -70,7 +69,8 @@ KERNEL_HEADERS = $(addprefix $(HEADDIR)/, $(KERNEL_HEADS))
 GRUBDIR = grub
 GRUBCFG = grub.cfg
 
-BOOT_SRCS = boot.s
+BOOT_SRCS =	boot.s \
+			load_gdt.s \
 
 BOOT_SOURCES = $(addprefix $(SRCDIR)/$(BOOTDIR)/, $(BOOT_SRCS))
 BOOT_OBJECTS = $(addprefix $(OBJDIR)/$(BOOTDIR)/, $(BOOT_SRCS:.s=.o))

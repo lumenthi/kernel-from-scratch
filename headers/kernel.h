@@ -13,6 +13,7 @@ typedef unsigned long	uint64_t;*/
 #include <stdint.h>
 #include "kernlib.h"
 
-void	init_gdt(void);
+extern void	init_gdt(void);
+extern void	load_gdt(uint32_t base, uint16_t limit);
 
 #endif

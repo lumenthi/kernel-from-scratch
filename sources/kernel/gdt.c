@@ -16,7 +16,7 @@
 
 static void	print_gdt_entry(uint64_t gdt_entry)
 {
-	printk("-- Struct view --\n");
+	/*printk("-- Struct view --\n");
 	printk("Base 24-31:  0x%.2llX\n", (gdt_entry >> 56) & 0xFF);
 	printk("Flags:       0x%.1llX\n", (gdt_entry >> 52) & 0xF);
 	printk("Limit 16-19: 0x%.1llX\n", (gdt_entry >> 48) & 0xF);
@@ -25,7 +25,7 @@ static void	print_gdt_entry(uint64_t gdt_entry)
 	printk("Base 0-15:   0x%.4llX\n", (gdt_entry >> 16) & 0xFFFF);
 	printk("Limit 0-15:  0x%.4llX\n", gdt_entry & 0xFFFF);
 
-	printk("-- Value view --\n");
+	printk("-- Value view --\n");*/
 	/* Retrieve base value */
 	uint32_t base = 0;
 	base |= (gdt_entry >> 56) & 0xFF;
@@ -124,7 +124,22 @@ void	init_gdt(void)
 {
 	printk("\nNull entry:\n");
 	gdt_entry((void*)0x00000800, 0, 0, 0, 0);
-	printk("\nSecond entry:\n");
-	gdt_entry((void*)0x00000808, 0x12345678, 0, create_flags(0, 0, 1),
+	printk("\nKernel code:\n");
+	gdt_entry((void*)0x00000808, 0x0, 0x003FFFFF, create_flags(0, 1, 1),
 		create_access_byte(1, 0, 1, 1, 0, 1, 0));
+	printk("\nKernel data:\n");
+	gdt_entry((void*)0x00000810, 0x00400000, 0x003FFFFF, create_flags(0, 1, 1),
+		create_access_byte(1, 0, 1, 0, 1, 0, 0));
+	printk("\nKernel stack:\n");
+	gdt_entry((void*)0x00000818, 0x00800000, 0x003FFFFF, create_flags(0, 1, 1),
+		create_access_byte(1, 0, 1, 0, 1, 1, 0));
+	printk("\nUser code:\n");
+	gdt_entry((void*)0x00000820, 0x01000000, 0x003FFFFF, create_flags(0, 1, 1),
+		create_access_byte(1, 3, 1, 1, 0, 1, 0));
+	printk("\nUser data:\n");
+	gdt_entry((void*)0x00000828, 0x01400000, 0x003FFFFF, create_flags(0, 1, 1),
+		create_access_byte(1, 3, 1, 0, 1, 0, 0));
+	printk("\nUser stack:\n");
+	gdt_entry((void*)0x00000830, 0x01800000, 0x003FFFFF, create_flags(0, 1, 1),
+		create_access_byte(1, 3, 1, 0, 1, 1, 0));
 }

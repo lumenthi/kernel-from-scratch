@@ -16,8 +16,6 @@ void	print_bits(void *ptr, size_t bit_size)
 			i++;
 			j++;
 		}
-		/*printk("%.2X", c);
-		i+=8;*/
 		in--;
 	}
 }
