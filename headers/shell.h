@@ -3,7 +3,7 @@
 
 #define INPUT_LENGTH 4096
 
-char	shell_buf[INPUT_LENGTH+1]; /* +1 for trailing '\0' */
+extern char	shell_buf[INPUT_LENGTH+1]; /* +1 for trailing '\0' */
 
 /* Shell commands structure */
 struct shell_command {
@@ -12,7 +12,7 @@ struct shell_command {
 };
 
 /* All commands available declared in shell.c */
-struct shell_command	*cmd_list;
+extern struct shell_command	*cmd_list;
 
 /* shell.c */
 void	help(void);

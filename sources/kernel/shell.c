@@ -3,6 +3,9 @@
 #include "shell.h"
 #include "vga.h"
 
+struct shell_command *cmd_list;
+char shell_buf[INPUT_LENGTH+1]; /* +1 for trailing '\0' */
+
 static struct shell_command commands[] = {
 	{"shutdown", poweroff},
 	{"help", help},
