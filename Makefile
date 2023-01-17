@@ -112,7 +112,7 @@ CROSS = '\033[1;31mx\033[0m'
 
 all:
 	@ $(MAKE) -s -C $(KERNLIBDIR)
-	@ env DOCKER_COMPILE=0 $(MAKE) --no-print-directory $(X86TARGETDIR)/$(NAME_ISO)
+	@ env DOCKER_COMPILE=1 $(MAKE) --no-print-directory $(X86TARGETDIR)/$(NAME_ISO)
 
 $(X86TARGETDIR)/$(NAME_ISO): $(KERNLIB) $(KERNEL_OBJECTS) $(BOOT_OBJECTS)
 	@ mkdir -p $(X86TARGETDIR)/$(ISODIR)/$(BOOTDIR)/$(GRUBDIR)
@@ -126,11 +126,11 @@ $(X86TARGETDIR)/$(NAME_ISO): $(KERNLIB) $(KERNEL_OBJECTS) $(BOOT_OBJECTS)
 ifeq ($(DOCKER_COMPILE), 0)
 	grub-mkrescue -o $(X86TARGETDIR)/$(NAME_ISO) $(X86TARGETDIR)/$(ISODIR)
 else
-	docker build -t $(NAME_DOCKER) .
-	docker run --rm --name $(NAME_DOCKER) -d $(NAME_DOCKER)
-	docker cp $(NAME_DOCKER):/$(NAME_ISO) $(X86TARGETDIR)/$(NAME_ISO)
-	touch $(X86TARGETDIR)/$(NAME_ISO)
-	docker kill $(NAME_DOCKER)
+	@ docker inspect --type=image kfs-build 1>/dev/null || docker build -t $(NAME_DOCKER) .
+	@ docker run --rm --name $(NAME_DOCKER) -d $(NAME_DOCKER)
+	@ docker cp $(NAME_DOCKER):/$(NAME_ISO) $(X86TARGETDIR)/$(NAME_ISO)
+	@ touch $(X86TARGETDIR)/$(NAME_ISO)
+	@ docker kill $(NAME_DOCKER)
 endif
 
 	@ printf " %b | Compiled %b%b%b\n" $(TICK) $(GREEN) $(NAME) $(BLANK)
@@ -198,7 +198,7 @@ todo:
 	@ grep -nr "TODO" $(SRCDIR) $(HEADDIR) || true
 	@ printf "%b" $(BLANK)
 
-run:
+run: all
 	$(QEMU) -cdrom $(X86TARGETDIR)/$(NAME_ISO)
 
 docker:
