@@ -19,10 +19,8 @@ void kernel_entry(void)
 	/* Initialize terminal interface */
 	terminal_initialize();
 	shell_initialize();
-
 	/* GDT */
-	/*init_gdt();
-	load_gdt(0x0, 0x38);*/
+	install_gdt();
 
 	while (running) {
 		c = keyboard_handler();

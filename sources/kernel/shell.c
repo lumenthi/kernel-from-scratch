@@ -8,6 +8,7 @@ char shell_buf[INPUT_LENGTH+1]; /* +1 for trailing '\0' */
 
 static struct shell_command commands[] = {
 	{"shutdown", poweroff},
+	{"exit", poweroff},
 	{"help", help},
 	{NULL, NULL}
 };

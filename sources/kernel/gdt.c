@@ -1,5 +1,6 @@
 #include "printk.h"
 #include "kernlib.h"
+#include "kernel.h"
 #include <stdint.h>
 
 #define ACCESS_P(X)		(X >> 7) & 1
@@ -14,6 +15,8 @@
 #define FLAG_DB(X)		(X >> 2) & 1
 #define FLAG_L(X)		(X >> 1) & 1
 
+extern void	_gdt_flush();
+
 static void	print_gdt_entry(uint64_t gdt_entry)
 {
 	/*printk("-- Struct view --\n");
@@ -24,7 +27,6 @@ static void	print_gdt_entry(uint64_t gdt_entry)
 	printk("Base 16-23:  0x%.2llX\n", (gdt_entry >> 32) & 0xFF);
 	printk("Base 0-15:   0x%.4llX\n", (gdt_entry >> 16) & 0xFFFF);
 	printk("Limit 0-15:  0x%.4llX\n", gdt_entry & 0xFFFF);
-
 	printk("-- Value view --\n");*/
 	/* Retrieve base value */
 	uint32_t base = 0;
@@ -99,23 +101,23 @@ static void gdt_entry(uint8_t *target, uint32_t base, uint32_t limit, uint8_t fl
 	 * |        Base        |       Limit       |
 	 */
 
-    // Limit
-    target[0] = limit & 0xFF;
-    target[1] = (limit >> 8) & 0xFF;
-    target[6] = (limit >> 16) & 0x0F;
+	// Limit
+	target[0] = limit & 0xFF;
+	target[1] = (limit >> 8) & 0xFF;
+	target[6] = (limit >> 16) & 0x0F;
 
-    // Base
-    target[2] = base & 0xFF;
-    target[3] = (base >> 8) & 0xFF;
-    target[4] = (base >> 16) & 0xFF;
-    target[7] = (base >> 24) & 0xFF;
+	// Base
+	target[2] = base & 0xFF;
+	target[3] = (base >> 8) & 0xFF;
+	target[4] = (base >> 16) & 0xFF;
+	target[7] = (base >> 24) & 0xFF;
 
-    // Access byte
-    target[5] = access_byte;
+	// Access byte
+	target[5] = access_byte;
 
-    // Flags
-    target[6] |= (flags << 4);
-	
+	// Flags
+	target[6] |= (flags << 4);
+
 	uint64_t entry = *(uint64_t*)target;
 	print_gdt_entry(entry);
 }
@@ -125,21 +127,53 @@ void	init_gdt(void)
 	printk("\nNull entry:\n");
 	gdt_entry((void*)0x00000800, 0, 0, 0, 0);
 	printk("\nKernel code:\n");
-	gdt_entry((void*)0x00000808, 0x0, 0x003FFFFF, create_flags(0, 1, 1),
+	gdt_entry((void*)0x00000808, 0x0, 0xFFFFFFFF, create_flags(0, 1, 1),
 		create_access_byte(1, 0, 1, 1, 0, 1, 0));
 	printk("\nKernel data:\n");
-	gdt_entry((void*)0x00000810, 0x00400000, 0x003FFFFF, create_flags(0, 1, 1),
+	gdt_entry((void*)0x00000810, 0x0, 0xFFFFFFFF, create_flags(0, 1, 1),
 		create_access_byte(1, 0, 1, 0, 1, 0, 0));
-	printk("\nKernel stack:\n");
-	gdt_entry((void*)0x00000818, 0x00800000, 0x003FFFFF, create_flags(0, 1, 1),
-		create_access_byte(1, 0, 1, 0, 1, 1, 0));
-	printk("\nUser code:\n");
-	gdt_entry((void*)0x00000820, 0x01000000, 0x003FFFFF, create_flags(0, 1, 1),
-		create_access_byte(1, 3, 1, 1, 0, 1, 0));
-	printk("\nUser data:\n");
-	gdt_entry((void*)0x00000828, 0x01400000, 0x003FFFFF, create_flags(0, 1, 1),
-		create_access_byte(1, 3, 1, 0, 1, 0, 0));
-	printk("\nUser stack:\n");
-	gdt_entry((void*)0x00000830, 0x01800000, 0x003FFFFF, create_flags(0, 1, 1),
-		create_access_byte(1, 3, 1, 0, 1, 1, 0));
+	uint32_t *ptr = (uint32_t *)0x00000808;
+	int i = 0;
+	while (i < 3) {
+		printk("GDT Entry %d: %x\n", i, ptr[i]);
+		i++;
+	}
+	//printk("\nKernel stack:\n");
+	//gdt_entry((void*)0x00000818, 0x00800000, 0x003FFFFF, create_flags(0, 1, 1),
+	//	create_access_byte(1, 0, 1, 0, 1, 1, 0));
+	//printk("\nUser code:\n");
+	//gdt_entry((void*)0x00000820, 0x01000000, 0x003FFFFF, create_flags(0, 1, 1),
+	//	create_access_byte(1, 3, 1, 1, 0, 1, 0));
+	//printk("\nUser data:\n");
+	//gdt_entry((void*)0x00000828, 0x01400000, 0x003FFFFF, create_flags(0, 1, 1),
+	//	create_access_byte(1, 3, 1, 0, 1, 0, 0));
+	//printk("\nUser stack:\n");
+	//gdt_entry((void*)0x00000830, 0x01800000, 0x003FFFFF, create_flags(0, 1, 1),
+	//	create_access_byte(1, 3, 1, 0, 1, 1, 0));
+}
+
+struct gdt_entry
+{
+	unsigned short limit_low;
+	unsigned short base_low;
+	unsigned char base_middle;
+	unsigned char access;
+	unsigned char granularity;
+	unsigned char base_high;
+} __attribute__((packed));
+
+struct gdt_ptr
+{
+	unsigned short limit;
+	unsigned int base;
+} __attribute__((packed));
+struct gdt_ptr _gp;
+
+void install_gdt(void)
+{
+	init_gdt();
+	/* Setup the GDT pointer and limit */
+	_gp.limit = (sizeof(struct gdt_entry) * 3) - 1;
+	_gp.base = 0x00000800;
+	//_gdt_flush();
 }
