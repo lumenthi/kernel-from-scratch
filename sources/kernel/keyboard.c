@@ -2,6 +2,7 @@
 #include "kernel.h"
 #include "printk.h"
 #include "vga.h"
+#include "shell.h"
 
 const unsigned char keyboard_mapping[256] =
 {
@@ -23,19 +24,20 @@ bool	is_print(char c)
 	return false;
 }
 
-size_t	delay;
+size_t			delay;
 unsigned char	c;
 unsigned char	oldc;
 
+bool	shift = false;
+bool	repeat = false;
 bool	kcaps = false;
 bool	kshift = false;
 
 unsigned char	keyboard_handler()
 {
-	c = inb(0x60);
+	while ((c = inb(0x60)) == oldc && !repeat);
 	if (c == oldc)
 		return c;
-	//printk("Current char = 0x%X\n", c);
 	if (oldc == KEXTENDED) {
 		oldc = c;
 		if (c == KP_RIGHT &&
@@ -102,11 +104,18 @@ unsigned char	keyboard_handler()
 	else if (c == KR_CAPSLOCK)
 		kcaps = kcaps == 1 ? 0 : 1;
 	else if (c == KP_ENTER) {
-		current_cursor->x = VGA_WIDTH - 1;
-		current_cursor->y = VGA_HEIGHT - 1;
-		newline();
+		get_command();
+		if (shell_buf && strlen(shell_buf)) {
+			newline();
+			handle_command(shell_buf);
+		}
+		else {
+			current_cursor->x = VGA_WIDTH - 1;
+			current_cursor->y = VGA_HEIGHT - 1;
+			newline();
+		}
 		printk("%s", KPROMPT);
-		return keyboard_mapping[c];
+		return c;
 	}
 	c = keyboard_mapping[c];
 	if (is_print(c)) {
@@ -120,5 +129,5 @@ unsigned char	keyboard_handler()
 			kputchar(c);
 		}
 	}
-	return c;
+	return oldc;
 }
