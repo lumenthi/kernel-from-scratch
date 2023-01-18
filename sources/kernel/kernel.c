@@ -6,19 +6,30 @@
 #include "printk.h"
 #include "keyboard.h"
 #include "vga.h"
+#include "shell.h"
 
 bool running;
 
 void kernel_entry(void)
 {
+	unsigned char c;
+
 	running = true;
+	c = keyboard_handler(); /* Flush the keyboard */
 	/* Initialize terminal interface */
 	terminal_initialize();
+	shell_initialize();
 
-	unsigned char c;
+	/* GDT */
+	/*init_gdt();
+	load_gdt(0x0, 0x38);*/
+
 	while (running) {
 		c = keyboard_handler();
 		switch (c) {
+			case KP_ENTER:
+				shell_reset();
+				break;
 			case KP_ESC:
 				running = false;
 				break;
