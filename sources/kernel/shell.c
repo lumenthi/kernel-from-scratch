@@ -29,8 +29,7 @@ int handle_command(char *str)
 	int i = 0;
 
 	while (cmd_list[i].name) {
-		if (!strcmp(cmd_list[i].name, str))
-		{
+		if (!strcmp(cmd_list[i].name, str)) {
 			cmd_list[i].routine();
 			return 0;
 		}
@@ -53,6 +52,21 @@ void get_command(void)
 		shell_buf[i-offset] = c;
 		i++;
 	}
+}
+
+int str_empty(char *str)
+{
+	int i = 0;
+
+	if (!str)
+		return 1;
+
+	while(str[i]) {
+		if (str[i] > 33 && str[i] < 127)
+			return 0;
+		i++;
+	}
+	return 1;
 }
 
 void shell_reset(void)

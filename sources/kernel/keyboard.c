@@ -105,7 +105,7 @@ unsigned char	keyboard_handler()
 		kcaps = kcaps == 1 ? 0 : 1;
 	else if (c == KP_ENTER) {
 		get_command();
-		if (shell_buf && strlen(shell_buf)) {
+		if (shell_buf && strlen(shell_buf) && !str_empty(shell_buf)) {
 			newline();
 			handle_command(shell_buf);
 		}

@@ -20,4 +20,6 @@ void	shell_initialize(void);
 void	shell_reset(void);
 void	get_command(void);
 int		handle_command(char *str);
+int		str_empty(char *str);
+
 #endif
