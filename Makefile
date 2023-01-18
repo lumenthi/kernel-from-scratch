@@ -129,7 +129,7 @@ ifeq ($(DOCKER_COMPILE), 0)
 	grub-mkrescue -o $(X86TARGETDIR)/$(NAME_ISO) $(X86TARGETDIR)/$(ISODIR)
 else
 	@ docker inspect --type=image kfs-build 1>/dev/null || docker build -t $(NAME_DOCKER) .
-	@ docker start $(NAME_DOCKER)
+	@ docker start $(NAME_DOCKER) || docker run --name $(NAME_DOCKER) -d $(NAME_DOCKER)
 	@ docker cp $(X86TARGETDIR)/$(ISODIR) $(NAME_DOCKER):/$(ISODIR)
 	docker exec kfs-build grub-mkrescue -o $(NAME_ISO) $(ISODIR)
 	@ docker cp $(NAME_DOCKER):/$(NAME_ISO) $(X86TARGETDIR)/$(NAME_ISO)
