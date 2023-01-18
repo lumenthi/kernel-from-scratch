@@ -12,6 +12,9 @@ bool running;
 
 void kernel_entry(void)
 {
+	/* GDT */
+	install_gdt();
+
 	unsigned char c;
 
 	running = true;
@@ -19,8 +22,6 @@ void kernel_entry(void)
 	/* Initialize terminal interface */
 	terminal_initialize();
 	shell_initialize();
-	/* GDT */
-	install_gdt();
 
 	while (running) {
 		c = keyboard_handler();
