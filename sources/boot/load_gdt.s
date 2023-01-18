@@ -13,4 +13,4 @@ _gdt_flush:
 	jmp 0x08:_ret; 0x08 is the offset to our code segment
 
 _ret:
-	ret; Jump back to the C code!
+	ret; jump back to the C code!
