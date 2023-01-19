@@ -22,6 +22,7 @@ uint8_t	inb(uint16_t port);
 
 /* ACPI management */
 void	poweroff(void);
+void	reboot(void);
 
 /* terminal */
 void			kputchar(char c);

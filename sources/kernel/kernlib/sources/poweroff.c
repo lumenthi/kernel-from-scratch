@@ -1,5 +1,3 @@
-#
-
 #include "kernlib.h"
 
 void poweroff(void)

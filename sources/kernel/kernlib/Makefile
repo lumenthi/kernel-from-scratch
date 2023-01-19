@@ -27,6 +27,7 @@ SRC_RAW =	strlen.c \
 			atoi.c \
 			ansi.c \
 			poweroff.c \
+			reboot.c \
 			case.c \
 			print_bits.c \
 			print_hexa.c \
