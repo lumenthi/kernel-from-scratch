@@ -72,7 +72,7 @@ GRUBDIR = grub
 GRUBCFG = grub.cfg
 
 BOOT_SRCS =	boot.s \
-			load_gdt.s \
+			gdt_flush.s \
 
 BOOT_SOURCES = $(addprefix $(SRCDIR)/$(BOOTDIR)/, $(BOOT_SRCS))
 BOOT_OBJECTS = $(addprefix $(OBJDIR)/$(BOOTDIR)/, $(BOOT_SRCS:.s=.o))
