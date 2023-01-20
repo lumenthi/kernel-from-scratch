@@ -35,9 +35,9 @@ void	terminal_initialize(void)
 		}
 	}
 
-	printk("--- Welcome to 42 KFS | {green}Screen 1{reset} ---\n");
+	printk("--- Welcome to 42 KFS | typOS | {green}Screen 1{reset} ---\n");
 	swap_screen();
-	printk("--- Welcome to 42 KFS | {cyan}Screen 2{reset} ---\n");
+	printk("--- Welcome to 42 KFS | typOS | {cyan}Screen 2{reset} ---\n");
 	swap_screen();
 
 	cursor[0].y = VGA_HEIGHT - 1;

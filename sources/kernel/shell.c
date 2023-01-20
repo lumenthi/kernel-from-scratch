@@ -7,11 +7,11 @@ struct shell_command *cmd_list;
 char shell_buf[INPUT_LENGTH+1]; /* +1 for trailing '\0' */
 
 static struct shell_command commands[] = {
-	{"shutdown", poweroff},
-	{"reboot", reboot},
-	{"stack", print_stack},
-	{"exit", poweroff},
-	{"help", help},
+	{"shudtown", poweroff},
+	{"reobot", reboot},
+	{"satck", print_stack},
+	{"xeit", poweroff},
+	{"hepl", help},
 	{NULL, NULL}
 };
 
@@ -39,7 +39,7 @@ int handle_command(char *str)
 		i++;
 	}
 
-	printk("typos: %s command not found\n", str);
+	printk("typOS: %s command not found\n", str);
 	return 1;
 }
 
