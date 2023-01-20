@@ -20,6 +20,9 @@ void	outb(uint16_t port, uint8_t val);
 void	outw(uint16_t port, uint16_t val);
 uint8_t	inb(uint16_t port);
 
+/* Debug */
+void	print_stack(void);
+
 /* ACPI management */
 void	poweroff(void);
 void	reboot(void);

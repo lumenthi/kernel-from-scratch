@@ -30,6 +30,7 @@ SRC_RAW =	strlen.c \
 			reboot.c \
 			case.c \
 			print_bits.c \
+			print_stack.c \
 			print_hexa.c \
 
 SRC_SIZE = $(shell ls sources | wc -l)
