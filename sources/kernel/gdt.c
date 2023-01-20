@@ -1,145 +1,109 @@
 #include "printk.h"
 #include "kernlib.h"
+#include "kernel.h"
 #include <stdint.h>
 
-#define ACCESS_P(X)		(X >> 7) & 1
-#define ACCESS_DPL(X)	(X >> 6) & 1
-#define ACCESS_S(X)		(X >> 4) & 1
-#define ACCESS_E(X)		(X >> 3) & 1
-#define ACCESS_DC(X)	(X >> 2) & 1
-#define ACCESS_RW(X)	(X >> 1) & 1
-#define ACCESS_A(X)		(X >> 0) & 1
+#define GDTBASE 0x00000800
+#define GDTENTRIES 7
 
-#define FLAG_G(X)		(X >> 3) & 1
-#define FLAG_DB(X)		(X >> 2) & 1
-#define FLAG_L(X)		(X >> 1) & 1
+/* Bitwise functions */
+#define SEG_DESCTYPE(x) ((x) << 0x04)           /* Descriptor type (0 for system, 1 for code/data) */
+#define SEG_PRES(x) ((x) << 0x07)               /* Present */
+#define SEG_SAVL(x) ((x) << 0x0C)               /* Available for system use */
+#define SEG_LONG(x) ((x) << 0x0D)               /* Long mode */
+#define SEG_SIZE(x) ((x) << 0x0E)               /* Size (0 for 16-bit, 1 for 32) */
+#define SEG_GRAN(x) ((x) << 0x0F)               /* Granularity (0 for 1B - 1MB, 1 for 4KB - 4GB) */
+#define SEG_PRIV(x) (((x) &  0x03) << 0x05)     /* Set privilege level (0 - 3) */
 
-static void	print_gdt_entry(uint64_t gdt_entry)
+/* Flags values */
+#define SEG_DATA_RD        0x00     /* Read-Only */
+#define SEG_DATA_RDA       0x01     /* Read-Only, accessed */
+#define SEG_DATA_RDWR      0x02     /* Read/Write */
+#define SEG_DATA_RDWRA     0x03     /* Read/Write, accessed */
+#define SEG_DATA_RDEXPD    0x04     /* Read-Only, expand-down */
+#define SEG_DATA_RDEXPDA   0x05     /* Read-Only, expand-down, accessed */
+#define SEG_DATA_RDWREXPD  0x06     /* Read/Write, expand-down */
+#define SEG_DATA_RDWREXPDA 0x07     /* Read/Write, expand-down, accessed */
+#define SEG_CODE_EX        0x08     /* Execute-Only */
+#define SEG_CODE_EXA       0x09     /* Execute-Only, accessed */
+#define SEG_CODE_EXRD      0x0A     /* Execute/Read */
+#define SEG_CODE_EXRDA     0x0B     /* Execute/Read, accessed */
+#define SEG_CODE_EXC       0x0C     /* Execute-Only, conforming */
+#define SEG_CODE_EXCA      0x0D     /* Execute-Only, conforming, accessed */
+#define SEG_CODE_EXRDC     0x0E     /* Execute/Read, conforming */
+#define SEG_CODE_EXRDCA    0x0F     /* Execute/Read, conforming, accessed */
+
+struct gdt_entry
 {
-	/*printk("-- Struct view --\n");
-	printk("Base 24-31:  0x%.2llX\n", (gdt_entry >> 56) & 0xFF);
-	printk("Flags:       0x%.1llX\n", (gdt_entry >> 52) & 0xF);
-	printk("Limit 16-19: 0x%.1llX\n", (gdt_entry >> 48) & 0xF);
-	printk("Access byte: 0x%.2llX\n", (gdt_entry >> 40) & 0xFF);
-	printk("Base 16-23:  0x%.2llX\n", (gdt_entry >> 32) & 0xFF);
-	printk("Base 0-15:   0x%.4llX\n", (gdt_entry >> 16) & 0xFFFF);
-	printk("Limit 0-15:  0x%.4llX\n", gdt_entry & 0xFFFF);
+	unsigned short limit_low;
+	unsigned short base_low;
+	unsigned char base_middle;
+	unsigned char access;
+	unsigned char granularity;
+	unsigned char base_high;
+} __attribute__((packed));
 
-	printk("-- Value view --\n");*/
-	/* Retrieve base value */
-	uint32_t base = 0;
-	base |= (gdt_entry >> 56) & 0xFF;
-	base <<= 24;
-	base |= (gdt_entry >> 16) & 0xFFFFFF;
-	printk("Base = 0x%.8llX\n", base);
+struct gdt_ptr
+{
+	unsigned short limit;
+	unsigned int base;
+} __attribute__((packed));
 
-	/* Retrieve limit value */
-	uint32_t limit = 0;
-	limit |= (gdt_entry >> 48) & 0xF;
-	limit <<= 16;
-	limit |= gdt_entry & 0xFFFF;
-	printk("Limit = 0x%.5llX\n", limit);
+struct gdt_entry	gdt[GDTENTRIES];
+struct gdt_ptr		_gp;
+extern void			_gdt_flush(void);
 
-	/* Retrieve access byte */
-	uint8_t access_byte = (gdt_entry >> 40) & 0xFF;
-	printk("Access byte:\n");
-	printk("| P = %d | DPL = %d | S = %d | E = %d | DC = %d | RW = %d | A = %d |\n",
-		ACCESS_P(access_byte), ACCESS_DPL(access_byte), ACCESS_S(access_byte),
-		ACCESS_E(access_byte), ACCESS_DC(access_byte), ACCESS_RW(access_byte),
-		ACCESS_A(access_byte));
-
-	/* Retrieve flags */
-	uint8_t flags = (gdt_entry >> 52) & 0xF;
-	printk("Flags:\n");
-	printk("| G = %d | DB = %d | L = %d | Reserved |\n",
-		FLAG_G(flags), FLAG_DB(flags), FLAG_L(flags));
+static void gdt_entry(int num, unsigned long base, unsigned long limit, unsigned char access, unsigned char gran)
+{
+	gdt[num].base_low = (base & 0xFFFF);
+	gdt[num].base_middle = (base >> 16) & 0xFF;
+	gdt[num].base_high = (base >> 24) & 0xFF;
+	gdt[num].limit_low = (limit & 0xFFFF);
+	gdt[num].granularity = ((limit >> 16) & 0x0F);
+	gdt[num].granularity |= (gran & 0xF0);
+	gdt[num].access = access;
 }
 
-static uint8_t	create_access_byte(uint8_t P, uint8_t DPL, uint8_t S, uint8_t E,
-	uint8_t DC, uint8_t RW, uint8_t A)
+/* Segments flags */
+#define GDT_CODE_PL0 SEG_DESCTYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
+                     SEG_LONG(0)     | SEG_SIZE(1) | SEG_GRAN(1) | \
+                     SEG_PRIV(0)     | SEG_CODE_EXRD
+#define GDT_DATA_PL0 SEG_DESCTYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
+                     SEG_LONG(0)     | SEG_SIZE(1) | SEG_GRAN(1) | \
+                     SEG_PRIV(0)     | SEG_DATA_RDWR
+#define GDT_STACK_PL0 SEG_DESCTYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
+                     SEG_LONG(0)     | SEG_SIZE(1) | SEG_GRAN(1) | \
+                     SEG_PRIV(0)     | SEG_DATA_RDWREXPD
+#define GDT_CODE_PL3 SEG_DESCTYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
+                     SEG_LONG(0)     | SEG_SIZE(1) | SEG_GRAN(1) | \
+                     SEG_PRIV(3)     | SEG_CODE_EXRD
+#define GDT_DATA_PL3 SEG_DESCTYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
+                     SEG_LONG(0)     | SEG_SIZE(1) | SEG_GRAN(1) | \
+                     SEG_PRIV(3)     | SEG_DATA_RDWR
+#define GDT_STACK_PL3 SEG_DESCTYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
+                     SEG_LONG(0)     | SEG_SIZE(1) | SEG_GRAN(1) | \
+                     SEG_PRIV(3)     | SEG_DATA_RDWREXPD
+
+void install_gdt()
 {
-	uint8_t	access_byte = 0;
+	/* NULL */
+	gdt_entry(0, 0, 0, 0, 0);
+	/* Kernel code */
+	gdt_entry(1, 0, 0xFFFFFFFF, (uint8_t)(GDT_CODE_PL0), 0xCF); /* 0x9A */
+	/* Kernel data */
+	gdt_entry(2, 0, 0xFFFFFFFF, (uint8_t)(GDT_DATA_PL0), 0xCF); /* 0x92 */
+	/* Kernel stack */
+	gdt_entry(3, 0, 0xFFFFFFFF, (uint8_t)(GDT_STACK_PL0), 0xCF); /* 0x96 */
+	/* User code */
+	gdt_entry(4, 0, 0xFFFFFFFF, (uint8_t)(GDT_CODE_PL3), 0xCF); /* 0xFA */
+	/* User data */
+	gdt_entry(5, 0, 0xFFFFFFFF, (uint8_t)(GDT_DATA_PL3), 0xCF); /* 0xF2 */
+	/* User stack */
+	gdt_entry(6, 0, 0xFFFFFFFF, (uint8_t)(GDT_STACK_PL3), 0xCF); /* 0xF6 */
 
-	access_byte |= P;
-	access_byte <<= 1;
-	access_byte |= DPL;
-	access_byte <<= 2;
-	access_byte |= S;
-	access_byte <<= 1;
-	access_byte |= E;
-	access_byte <<= 1;
-	access_byte |= DC;
-	access_byte <<= 1;
-	access_byte |= RW;
-	access_byte <<= 1;
-	access_byte |= A;
+	_gp.limit = (sizeof(struct gdt_entry) * GDTENTRIES) - 1;
+	_gp.base = GDTBASE;
 
-	return access_byte;
-}
-static uint8_t	create_flags(uint8_t G, uint8_t DB, uint8_t L)
-{
-	uint8_t	flags = 0;
-
-	flags |= G;
-	flags <<= 1;
-	flags |= DB;
-	flags <<= 1;
-	flags |= L;
-	flags <<= 1; // Shift for the last reserved byte ( = 0 )
-
-	return flags;
-}
-
-static void gdt_entry(uint8_t *target, uint32_t base, uint32_t limit, uint8_t flags, uint8_t access_byte)
-{
-	/* GDT Entry:
-	 * |63    56|55 52|51 48|47    40|39      32|
-	 * |  Base  |Flags|Limit| Access |   Base   |
-	 * |31                16|15                0|
-	 * |        Base        |       Limit       |
-	 */
-
-    // Limit
-    target[0] = limit & 0xFF;
-    target[1] = (limit >> 8) & 0xFF;
-    target[6] = (limit >> 16) & 0x0F;
-
-    // Base
-    target[2] = base & 0xFF;
-    target[3] = (base >> 8) & 0xFF;
-    target[4] = (base >> 16) & 0xFF;
-    target[7] = (base >> 24) & 0xFF;
-
-    // Access byte
-    target[5] = access_byte;
-
-    // Flags
-    target[6] |= (flags << 4);
-	
-	uint64_t entry = *(uint64_t*)target;
-	print_gdt_entry(entry);
-}
-
-void	init_gdt(void)
-{
-	printk("\nNull entry:\n");
-	gdt_entry((void*)0x00000800, 0, 0, 0, 0);
-	printk("\nKernel code:\n");
-	gdt_entry((void*)0x00000808, 0x0, 0x003FFFFF, create_flags(0, 1, 1),
-		create_access_byte(1, 0, 1, 1, 0, 1, 0));
-	printk("\nKernel data:\n");
-	gdt_entry((void*)0x00000810, 0x00400000, 0x003FFFFF, create_flags(0, 1, 1),
-		create_access_byte(1, 0, 1, 0, 1, 0, 0));
-	printk("\nKernel stack:\n");
-	gdt_entry((void*)0x00000818, 0x00800000, 0x003FFFFF, create_flags(0, 1, 1),
-		create_access_byte(1, 0, 1, 0, 1, 1, 0));
-	printk("\nUser code:\n");
-	gdt_entry((void*)0x00000820, 0x01000000, 0x003FFFFF, create_flags(0, 1, 1),
-		create_access_byte(1, 3, 1, 1, 0, 1, 0));
-	printk("\nUser data:\n");
-	gdt_entry((void*)0x00000828, 0x01400000, 0x003FFFFF, create_flags(0, 1, 1),
-		create_access_byte(1, 3, 1, 0, 1, 0, 0));
-	printk("\nUser stack:\n");
-	gdt_entry((void*)0x00000830, 0x01800000, 0x003FFFFF, create_flags(0, 1, 1),
-		create_access_byte(1, 3, 1, 0, 1, 1, 0));
+	memcpy((char *)_gp.base, (char *)gdt, _gp.limit);
+	_gdt_flush();
 }
