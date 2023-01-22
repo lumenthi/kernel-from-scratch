@@ -26,7 +26,6 @@ void help(void)
 	}
 }
 
-
 int handle_command(char *str)
 {
 	int i = 0;

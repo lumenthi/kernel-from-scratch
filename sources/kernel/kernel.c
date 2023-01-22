@@ -23,6 +23,9 @@ void kernel_entry(void)
 	terminal_initialize();
 	shell_initialize();
 
+	/* Debug stack example */
+	/* debug_stack(64); */
+
 	while (running) {
 		c = keyboard_handler();
 		switch (c) {

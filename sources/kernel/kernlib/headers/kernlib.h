@@ -21,7 +21,9 @@ void	outw(uint16_t port, uint16_t val);
 uint8_t	inb(uint16_t port);
 
 /* Debug */
-void	print_stack(void);
+uint32_t	*get_esp(void);
+void		print_stack(void);
+void		dump_mem(uint32_t *esp, uint32_t values);
 
 /* ACPI management */
 void	poweroff(void);
