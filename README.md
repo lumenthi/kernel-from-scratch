@@ -32,6 +32,8 @@ The __Kernel From Scratch__ is divided into many projects, each one dealing with
     * Minimalistic shell with a few commands:
         * help
         * shutdown
+        * reboot
+        * stack
         * exit
 
 ## Compiling
