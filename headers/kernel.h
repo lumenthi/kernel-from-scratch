@@ -13,7 +13,7 @@ typedef unsigned long	uint64_t; */
 #include <stdint.h>
 #include "kernlib.h"
 
-#define debug_stack(bytes) printk("\n");dump_mem(get_esp(), bytes)
+#define debug_stack(bytes) printk("\n");register uint32_t *esp asm("esp");dump_mem(esp, bytes)
 
 void	install_gdt(void);
 

@@ -100,14 +100,13 @@ CFLAGS =	-I $(INCLUDES_DIR) -I $(PRINTK_INC_DIR) \
 			#-fsanitize=address -g3 \
 
 # Color declarations
-RED := "\e[0;31m"
-GREEN := "\e[0;32m"
-YELLOW := "\e[0;33m"
-BLUE := "\e[0;34m"
-MAGENTA := "\e[0;35m"
-CYAN := "\e[0;36m"
-RESET :="\e[0m"
+GREEN = '\033[4;32m'
+RED = '\033[4;31m'
 BLANK = '\033[0m'
+YELLOW = '\033[4;33m'
+CYAN = '\033[4;38;5;51m'
+WARNING = '\033[1;33m'
+RESET = '\033[0m'
 
 TICK = '\033[1;32m~\033[0m'
 CROSS = '\033[1;31mx\033[0m'
@@ -137,7 +136,7 @@ $(BIN_DIR)/$(NAME): $(OBJ_DIR) $(OBJ) $(PRINTK_OBJ_DIR) $(PRINTK_OBJ)
 #	@printf "\e[0;36m[INFO] Linking ${NAME}\e[0m\n"
 	ar rc --target elf32-i386 $(NAME) $(OBJ) $(PRINTK_OBJ)
 	ranlib $(NAME)
-	@ printf " %b | Compiled %blibft%b\n" $(TICK) $(GREEN) $(BLANK)
+	@ printf " %b | Compiled %bkernlib%b\n" $(TICK) $(GREEN) $(BLANK)
 
 clean:
 	@ test -d $(OBJ_DIR) && rm -rf $(OBJ_DIR) && \

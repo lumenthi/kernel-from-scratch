@@ -1,12 +1,6 @@
 #include "kernlib.h"
 #include "printk.h"
 
-uint32_t *get_esp(void)
-{
-	register uint32_t *esp asm("esp");
-	return esp;
-}
-
 void dump_mem(uint32_t *esp, uint32_t values)
 {
 	int i = 0;
