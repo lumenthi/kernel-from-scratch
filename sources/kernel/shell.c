@@ -12,6 +12,7 @@ static struct shell_command commands[] = {
 	{"satck", print_stack},
 	{"xeit", poweroff},
 	{"hepl", help},
+	{"lroe", lore},
 	{NULL, NULL}
 };
 
@@ -26,6 +27,13 @@ void help(void)
 	}
 }
 
+void lore(void)
+{
+	printk(	"The lore of typOS:\n"
+			"    WPI"
+			"\n"
+	);
+}
 
 int handle_command(char *str)
 {

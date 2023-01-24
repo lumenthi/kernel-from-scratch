@@ -1,2 +1,0 @@
-TODO: laisser appuyer sur la touche (donc timer)
-meilleure compile: pas de sudo apt-get etc spam, make re doit fonctionner etc
