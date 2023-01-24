@@ -16,6 +16,7 @@ extern struct shell_command	*cmd_list;
 
 /* shell.c */
 void	help(void);
+void	lore(void);
 void	shell_initialize(void);
 void	shell_reset(void);
 void	get_command(void);

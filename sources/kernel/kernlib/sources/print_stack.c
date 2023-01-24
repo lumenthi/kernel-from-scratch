@@ -7,7 +7,7 @@ void dump_mem(uint32_t *esp, uint32_t values)
 
 	while (i < values) {
 		if ((i) % 4 == 0)
-			printk("%p: ", esp+i);
+			printk("{cyan}0x%08x: {reset}", esp+i);
 		printk("0x%08x  ", esp[i]);
 		if ((i+1) % 4 == 0)
 			printk("\n");
