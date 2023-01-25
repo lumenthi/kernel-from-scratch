@@ -11,7 +11,10 @@ A tiny _32-bit kernel_ made from scratch with very basic features.
 * [Authors](#authors)
 
 ## Introduction
-The __Kernel From Scratch__ is divided into many projects, each one dealing with a specific aspect of kernel programming.
+The __Kernel From Scratch__ is divided into many projects, each one dealing with a specific aspect of kernel programming.  
+  
+  
+![run](docs/run.png)  
 
 ## Features
 - __KFS-1__
