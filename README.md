@@ -1,4 +1,5 @@
 # TypOS [![Generic badge](https://img.shields.io/badge/version-0.2.0-green.svg)](https://shields.io/) [![Generic badge](https://img.shields.io/badge/language-c-orange.svg)](https://shields.io/)
+![title](docs/main.png)  
 A tiny _32-bit kernel_ made from scratch with very basic features.
 
 ## Summary
